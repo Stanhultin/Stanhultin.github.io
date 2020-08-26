@@ -1,1 +1,2 @@
-# shultin1.github.io
+Name: Stan Hultin's Site
+Title: Null
