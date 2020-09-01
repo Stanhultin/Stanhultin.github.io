@@ -1,7 +1,4 @@
-Name: Stan Hultin's Site
-Title: Null
+# Statistical Analysis with R
 
 [Assignment1](Assignment1.html)
 
-
-[Assignment1](Assignment1.html)
