@@ -1,0 +1,43 @@
+---
+title: "OPERATIONS ON NUMERIC VECTORS"
+author: "Stan Hultin"
+date: "8/31/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+1.
+```{r}
+x <- seq(1,100,3)
+sum(x)
+```
+2.
+```{r}
+x <- c(1:2020)
+sum(x^2020)
+```
+3.
+```{r}
+x <- seq(1,2020,1)
+y <- seq(2,2021,1)
+sum(1/(x*y))
+```
+4.
+```{r}
+x <- seq(1,2020,1)
+y <- seq(2,2021,1)
+z <- seq(3,2022,1)
+sum(1/(x*y*z))
+```
+5.
+```{r}
+x <- seq(1,2021,2)
+y <- seq(1,2021,2)
+sum(x^y)
+```
+
