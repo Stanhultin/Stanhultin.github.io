@@ -1,0 +1,73 @@
+---
+title: "Assignment 3"
+author: "Stan Hultin"
+date: "9/2/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+1.
+```{r}
+df <- read.csv('https://covid19.who.int/WHO-COVID-19-global-data.csv')
+```
+
+2. There are 40835 rows and 8 columns. There are 4 character and 4 integer variables.
+```{r}
+str(df)
+```
+
+3. There are 181 missing values, and Country_Code has the most missing values.
+```{r}
+sum(is.na(df))
+```
+```{r}
+colSums(is.na(df))
+```
+4. 
+```{r}
+str(df)
+```
+```{r}
+class(df$date)
+```
+5.
+```{r}
+mean(df$New_cases)
+
+```
+6. 96551
+```{r}
+summary(df$New_cases)
+```
+
+7.
+```{r}
+which.max(df$New_cases)
+```
+8. 7 regions
+```{r}
+table(df$WHO_region)
+```
+9.
+```{r}
+by(df$New_cases, df$WHO_region, mean)
+```
+10.
+```{r}
+df1 <- df[df$WHO_region=='AMRO',]
+mean(df1$New_cases)
+
+```
+11.
+``
+df$weekday <-(df$Date_reported)
+by(df$New_cases, df$weekday, mean)
+```
+
+
+
+
