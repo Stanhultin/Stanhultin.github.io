@@ -1,0 +1,80 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+
+1. Install Tidyverse
+2. 
+```{r}
+df <- read.csv('https://covidtracking.com/data/download/all-states-history.csv')
+```
+3. 
+```{r}
+library(lubridate)
+df$date <- ymd(df$date)
+df$month = month(df$date)
+df$weekday = wday(df$date)
+```
+
+4.
+```{r}
+library(tidyverse)
+df$Month2 <- case_when(
+  df$month <11 ~ 'early_month',
+  df$month <=20 ~ 'mid_month',
+  TRUE ~ 'end_month')
+```
+5. 
+```{r}
+select(df,totalTestsViral)
+```
+6. 
+```{r}
+x <- c(1:10)
+
+x %>% sum
+x %>% sqrt
+x %>% sqrt %>% sum
+x %>% sqrt %>% sum %>% log
+```
+7.
+```{r}
+df %>% 
+  group_by(dataQualityGrade) %>% 
+  summarise(median(positiveIncrease))
+```
+```{r}
+df %>% 
+  group_by(dataQualityGrade) %>% 
+  summarise(max(positiveIncrease))
+```
+
+```{r}
+df %>% 
+  group_by(Month2) %>% 
+  summarise(mean(positiveIncrease))
+```
+```{r}
+df %>% 
+  group_by(weekday) %>% 
+  summarise(mean(positiveIncrease))
+```
+8.
+```{r}
+df %>% 
+  filter(state=='MA') %>% 
+  summarise(mean(positiveIncrease))
+```
+```{r}
+df %>% 
+  filter(state=='MA'|state=='RI') %>% 
+  summarise(mean(positiveIncrease))
+```
+```{r}
+df %>% 
+  filter(state=='NE') %>% 
+  summarise(mean(positiveIncrease))
+```
+
