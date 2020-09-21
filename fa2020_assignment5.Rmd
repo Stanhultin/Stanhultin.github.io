@@ -1,0 +1,73 @@
+
+1. Use read_csv to import the titanic data. 
+```{r}
+library(tidyverse)
+df <- read.csv('https://bryantstats.github.io/math421/titanic.csv')
+```
+
+-------
+
+2. How many missing values in total?  Which columns has the most number if missing values?
+```{r}
+sum(is.na(df))
+colSums(is.na(df))
+```
+
+-------
+
+3. Remove the column with the most number of missing value
+```{r}
+df1 <- drop_na(df, Age)
+```
+
+-------
+
+4.  Remove rows containing missing values and save it as a new dataset. The original dataset remains unchanged by this action.
+```{r}
+df1 <- drop_na(df, Age)
+```
+
+-------
+
+5.  Replace the missing values of numeric variables with the corresponding average of the columns.
+
+```{r}
+df1 <- replace_na(df$Age, mean(df$Age, na.rm = TRUE))
+```
+
+-------
+
+6.  Replace the missing values of catagorical variables with the corresponding mode (most frequent value) of the columns. Hint:  You can use the `table` function to see what is the mode of the variable. 
+
+```
+```{r}
+table(df$Age)
+df$Age <- replace_na(df$Age, '23')
+```
+
+-------
+
+7.  The `Survived` column records whether a passenger is survived or not. `Survived = 1` means the passenger survived. Thus, the chance of survived for a random passenger can be estimated by
+
+```{r, eval=FALSE}
+mean(df$Survived)
+```
+
+Compare the chance of survived between male and female.  *Hint (Use group_by + summarise combo)*
+```{r}
+df %>% group_by('Sex') %>% 
+    summarise(Survivedbysex = mean(Survived, na.rm = TRUE))
+```
+
+-------
+
+8.  Use the `summary` function to find the first quartile (Q1) and the thrid quartile(Q3) of variable `Age`. Create a new variable taking values of `young` (Age < Q1), `middle` (Age from Q1 to Q3), and `old`(Age > Q3). Compare the chance of survived between these three groups of age. 
+
+```{r}
+df$Age2 <- case_when(
+  df$Age <20.12 ~ 'young',
+  df$Age <=38 ~ 'middle',
+  TRUE ~ 'old')
+```
+
+
