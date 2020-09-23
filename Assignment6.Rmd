@@ -1,0 +1,100 @@
+
+---
+output: 
+  html_document:
+  pdf_document: default
+  word_document: default
+title: "Assignment 6: Visualization - Aesthetic Mapping"
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE)
+library(tidyverse)
+df <- read.csv('https://covidtracking.com/data/download/all-states-history.csv')
+```
+
+-------
+
+**Questions**
+
+Use the data of your own.  Produce the following types of plots and comment on each plot. Plots should be meaningful. If you use the data we used in class, make sure the plots are not the same as the ones in the slides. 
+
+-------
+
+1. For one continuous variable:
+
+- Density
+```{r}
+df %>% ggplot()+
+geom_density(mapping = aes(x = deathIncrease))
+
+```
+
+
+- Histogram 
+```{r}
+df %>% ggplot()+
+geom_histogram(mapping = aes(x = deathIncrease))
+
+```
+
+- Boxplot
+```{r}
+df %>% ggplot()+
+  geom_boxplot(mapping = aes(y = deathIncrease))
+```
+
+-------
+
+2. For one categorical variable
+
+- Barplot
+```{r}
+df %>%filter(state=='NH') %>%  ggplot() + geom_bar(mapping = aes(x = state))
+```
+
+-------
+
+3. For one two continuous variables
+
+- Scatter Plot
+```{r}
+df %>% ggplot() + geom_point(mapping = aes(x = positiveIncrease, y = deathIncrease))
+```
+
+- Line Plot
+```{r}
+df %>% ggplot() + geom_line(mapping = aes(x = positiveIncrease, y = deathIncrease))
+```
+
+- Smooth Plot
+```{r}
+df %>% filter(state=='NH') %>% ggplot() + geom_smooth(mapping = aes(x = positiveIncrease, y = deathIncrease))
+```
+
+-------
+
+4. For one continuous + one categorical variables
+
+- Density
+```{r}
+df %>% filter(state=='NH') %>%  ggplot()+
+geom_density(mapping = aes(x = deathIncrease, color = state))
+```
+
+- BoxPlot
+```{r}
+df %>% filter(state=='NH') %>% filter(hospitalizedIncrease<1000) %>% ggplot()+
+geom_density(mapping = aes(x = hospitalizedIncrease, color = state))
+
+```
+
+-------
+
+5. For two categorical variables: barplot
+```{r}
+df %>% filter(state=='NH') %>% ggplot()+
+geom_bar(mapping=aes(x= state, fill= dataQualityGrade), position='dodge')
+```
+
