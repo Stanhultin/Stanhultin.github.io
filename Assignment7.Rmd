@@ -1,0 +1,62 @@
+
+---
+output: 
+  html_document:
+  pdf_document: default
+  word_document: default
+title: "Assignment 7: Visualization - Some aspects of ggplot2"
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE)
+library(tidyverse)
+df <- read.csv('https://covidtracking.com/data/download/all-states-history.csv')
+```
+-------
+
+1. Make a plot using `face_wrap` by one categorical variable 
+```{r}
+df %>% ggplot(mapping=aes(x=deathIncrease, y=hospitalizedIncrease)) + geom_point()+ facet_wrap(~state)
+```
+
+2. Make a plot using `face_wrap` by two categorical variables (`face_wrap(variable1~variable2)`)
+```{r}
+df %>% filter(state=='NH'|state=='MA') %>% ggplot(mapping=aes(x=deathIncrease), (y=hospitalizedIncrease)) + facet_wrap(date~state)
+```
+
+3. Make a plot using `position ='jitter'`. 
+```{r}
+df %>% filter(state=='NH'|state=='MA') %>% ggplot() + geom_point(mapping=aes(x=deathIncrease, y=hospitalizedIncrease, color=state), position='jitter')
+```
+
+4. Make a plot using `position ='dodge'`.
+```{r}
+df %>% filter(state=='NH'|state=='MA') %>% ggplot() + geom_point(mapping=aes(x=deathIncrease, y=hospitalizedIncrease, color=state), position='dodge')
+```
+
+5. Make a plot using `position ='fill'`. 
+```{r}
+df %>% filter(state=='NH'|state=='MA') %>% ggplot() + geom_point(mapping=aes(x=deathIncrease, y=hospitalizedIncrease, color=state), position='fill')
+```
+
+6. Make a plot using `geom_col`.
+```{r}
+df %>% filter(state=='NH'|state=='MA') %>% ggplot() + geom_col(mapping=aes(x=deathIncrease, y=hospitalizedIncrease, color=state))
+```
+
+7. Change the theme of one of your plots. 
+```{r}
+df %>% filter(state=='NH'|state=='MA') %>% ggplot() + geom_col(mapping=aes(x=deathIncrease, y=hospitalizedIncrease, color=state)) + theme_dark()
+```
+
+8. Save a plot and put a link of the plot to your Github Webpage.  To link a plot `abc.png` you just need to insert the following on the README.md
+
+```{r, eval=FALSE}
+[Link to the plot](abc.png)
+```
+
+
+
+
+
