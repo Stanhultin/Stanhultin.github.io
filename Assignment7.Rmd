@@ -17,7 +17,7 @@ df <- read.csv('https://covidtracking.com/data/download/all-states-history.csv')
 
 1. Make a plot using `face_wrap` by one categorical variable 
 ```{r}
-df %>% ggplot(mapping=aes(x=deathIncrease, y=hospitalizedIncrease)) + geom_point()+ facet_wrap(~state)
+df %>% filter(state=='NH'|state=='MA') %>% ggplot(mapping=aes(x=deathIncrease, y=hospitalizedIncrease)) + geom_point()+ facet_wrap(~state)
 ```
 
 2. Make a plot using `face_wrap` by two categorical variables (`face_wrap(variable1~variable2)`)
