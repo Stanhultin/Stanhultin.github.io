@@ -1,0 +1,418 @@
+
+---
+output: 
+  html_document:
+  pdf_document: default
+  word_document: default
+title: "Fall 2020 - Math 421 - Midterm"
+
+-------
+
+## I. Data Wranggling
+```{r}
+library(tidyverse)
+library(rpart)
+library(rattle)
+library(haven)
+library(gganimate)
+library(ggplot2)
+library(knitr)
+library(caret)
+library(ranger)
+```
+
+1. Download the data file `hdd0318cy.sas7bdat`.  
+
+
+2. Use `read_sas` in library `haven` to read the data. 
+```{r}
+df <- read_sas('C:\\Users\\student\\Documents\\Senior 1\\Stats R\\hdd0318cy (2).sas7bdat')
+```
+    
+3. Filter the data to have only patients of the year 2018 (`yod==2018`)
+```{r}
+df1 <- filter(df, yod==18)
+```
+
+4. Select to work with only following variables: 
+
+```{r}
+                      df1 <-  select(df1,"yod", "payfix","pay_ub92","age",  
+                      "sex","raceethn","provider","moa", 
+                      "yoa","mod","admtype", "asource" , 
+                      "preopday" ,"los", "service" , "icu","ccu",    
+                      "dispub92", "payer"  ,"drg","trandb", 
+                      "randbg","randbs","orr", "anes","seq",   
+                      "lab","dtest", "ther","blood","phar", 
+                      "other","patcon","bwght","total","tot" ,  
+                      "ecodub92","b_wt","pt_state","diag_adm","ancilar" ,
+                      "campus","er_fee","er_chrg","er_mode","obs_chrg",
+                      "obs_hour","psycchrg","nicu_day")
+```
+ 
+
+*Notice*:  You may want to save the current data to your computer for easy access later.  To save the data file use `write_csv(df, 'midterm.csv')`, for example.  
+
+5. What are variables that have missing values?
+```{r}
+colSums(is.na(df1))
+```
+ 
+6. Remove all variables with missing values
+```{r}
+df1$payfix <- NULL
+df1$preopday <- NULL
+df1$obs_hour <- NULL
+df1$nicu_day <- NULL
+
+```
+ 
+7. Refer to the data description in the file `HDD2015-18cy6-20-19.docx`, which variable recording the month of admission?, which variable recording the month of discharge?
+
+
+MOA is month of admission and MOD is month of discharge
+
+8. Which month admitted the most number of patients? Which month admitted the most number of male patients? March
+```{r}
+table(df1$moa)
+```
+
+```{r}
+df1 %>% 
+  filter(sex == 1) %>% 
+  group_by(moa) %>% 
+  summarise(patients = n())
+```
+
+9. Which month has the most number of teenage female patients?
+```{r}
+df1 %>% 
+   filter(sex == 2 & age %in% c(13:17)) %>% 
+  group_by(moa) %>% 
+  summarise(patients = n())
+```
+
+10. Which provider has the most number of female patients in October? 
+7205
+```{r}
+df1 %>% 
+    filter(sex == 2 & moa == 10) %>% 
+  group_by(provider) %>% 
+  summarise(patients = n())
+```
+
+11. Is female patients older than male patients, on average? 
+```{r}
+df1 %>% 
+  group_by(sex) %>% 
+  summarise(mean(age))
+```
+
+12. Calculate the average age of patients by months. Which month has the oldest patients on average age?
+```{r}
+df1 %>% 
+  group_by(moa) %>% 
+  summarise(mean(age))
+```
+
+13. What is the name of the provider that has the highest total charge?
+7205
+```{r}
+df1 %>% 
+  group_by(provider) %>% 
+  summarise(mean(tot))
+```
+
+14. What is the name of the provider that has the least total charge for teenage male on average?
+7205
+```{r}
+df1 %>% 
+  filter(sex=='1', age<20) %>%
+  group_by(provider) %>% 
+  summarise(mean(tot))
+```
+
+15. Calculate the length of stays by races.  Which race has the longest length of stays on average?
+```{r}
+df1 %>% 
+  group_by(raceethn) %>% 
+  summarise(mean(los))
+```
+
+16. On average, how much a 20 year-old male white get charged for staying 1 day?
+```{r}
+df1 %>% 
+  filter(sex=='1', age==20, raceethn=='1') %>%
+  group_by(los) %>% 
+  summarise(mean(tot))
+```
+
+-------
+
+## II. Data Visualization
+
+Continue with the data from part I. 
+
+1. Provides at least 10 meaningful plots. Comments on the plots. All plots should have title, caption, appropriate labels on x and y-axis
+
+This compares the lenght of stay and month of admission, further divided by race.
+```{r}
+df %>% ggplot()+
+  geom_smooth(mapping = aes(x = los, y = moa, color = raceethn))
+```
+Next I wanted to see the month of admission by race to see how many people where admissioned when.
+```{r}
+df %>% ggplot()+
+  geom_bar(mapping = aes(x = moa, fill = raceethn))
+```
+THen I wanted to see how many poeple were discharge in which month by 
+```{r}
+df %>% ggplot()+
+  geom_bar(mapping = aes(x = mod, fill = raceethn))
+```
+This graph compares moa and mod on the same graph to easily compare the two results.
+```{r}
+df %>% ggplot()+
+  geom_smooth(mapping = aes(x = moa, y = mod, color = raceethn))
+```
+Here I compare sexual orientation to the service provided.
+```{r}
+df %>% ggplot()+
+  geom_bar(mapping = aes(x = service, fill = sex))
+```
+Here I compare the total charge fee to the way the patients arrived to the hospital.
+
+```{r}
+df %>% ggplot()+
+  geom_bar(mapping = aes(x = er_mode, fill = tot))
+```
+Here the compare sexual orientation to how they got to the hospital. 
+```{r}
+df %>% ggplot()+
+  geom_bar(mapping = aes(x = er_mode, fill = sex))
+```
+This grpah shows the relationship between total fee, and the payer, filtered to sex.
+
+```{r}
+df %>% ggplot()+
+  geom_point(mapping = aes(x = tot, y = payer, color = sex))
+```
+This grpah shows the relationship between the admission type and the total charge.
+```{r}
+df %>% ggplot()+
+  geom_bar(mapping = aes(x = admtype, fill = tot))
+```
+This graph shows the total expense for each sex.
+```{r}
+df %>% ggplot()+
+  geom_bar(mapping = aes(x = sex, fill = tot))
+```
+
+
+2. Make an animation
+
+
+```{r}
+
+p1 <- ggplot(df, aes(x=er_mode, 
+                 y=tot, 
+                 fill=tot)) + 
+  geom_col()+
+  ylim(0, 2500)+
+  transition_states(moa) +
+labs(title = 'Total Charge by Month of Admission')
+animate(p1, nframes=100, fps=20)
+```
+
+-------
+
+## III. Predictive Models
+
+Continue with the data from part I. Use the follows as the target and input variables: 
+
+*Target Variable*: Create the target variable taking value of 
+
+  - `low cost` if the total charge of a patient (`tot`) is smaller than the median of the total charge, and
+
+  - `high cost` otherwise. 
+
+*Input Variables*:
+
+  - "age","sex","raceethn","provider","moa","mod","admtype","campus", 'los'
+  
+-------
+
+1. Make sure all the categorical variables are factor, numeric variables are numeric. Set Training : Testing Split = 10 : 90 
+```{r}
+df1$target <-  case_when(df1$tot <26896.54 ~ 'low cost',
+  TRUE ~ 'high cost')
+```
+
+```{r}
+df2 <- df1 %>% 
+  select(target,age,sex,raceethn,provider,moa,mod,admtype,campus,los)
+
+df2$raceethn <- factor(df2$raceethn)
+df2$provider <- factor(df2$provider)
+df2$admtype <- factor(df2$admtype)
+df2$campus <- factor(df2$campus)
+df2$age <- factor(df2$age)
+df2$moa <- factor(df2$moa)
+df2$mod <- factor(df2$mod)
+df2$sex <- factor(df2$sex)
+df2$los <- factor(df2$los)
+
+```
+
+```{r}
+set.seed(2018)
+splitIndex <- createDataPartition(df2$target, p = .1, 
+                                  list = FALSE)
+df2_train <- df2[ splitIndex,]
+df2_test <- df2[-splitIndex,]
+```
+
+
+2. Train a decision tree using `rpart`.  Plot the decision tree. Plot the variable importance ranked by the tree. 
+
+
+```{r}
+tree_model <- rpart(target ~ ., data = df2_train,
+                 control = rpart.control(maxdepth = 3))
+fancyRpartPlot(tree_model)
+```
+```{r}
+barplot(tree_model$variable.importance)
+```
+
+3. Using caret for this question. Set `Training Control` to be: Use Cross-Validation of 5 folds across all models.  Train & tune at least 3 different models (i.e. three different values for `method=` in the train function of caret).  Plot the hyper-parameter tuning plots for each model. 
+```{r}
+tuneGrid <-  expand.grid(mtry = 2:4)
+trControl <-  trainControl(method = "cv", number = 5)
+forest_cv <- train(target~., data=df2_train, 
+                                method = "rf", 
+                                trControl = trControl,
+                                tuneGrid = tuneGrid)
+plot(forest_cv)
+```
+
+```{r}
+tuneGrid1 <-  expand.grid(mtry = 2:4,
+                       splitrule = c('gini', 'extratrees'),
+                       min.node.size = c(1:10))
+trControl1 <-  trainControl(method = "cv",
+                            number = 5)
+forest_cv1 <- train(target~., data=df2_train, 
+                                method = "ranger", 
+                                trControl = trControl1,
+                                tuneGrid = tuneGrid1)
+plot(forest_cv1)
+```
+
+```{r}
+library(caTools)
+tuneGrid2 <-  expand.grid(nIter = 2:6)
+trControl2 <-  trainControl(method = "cv",
+                            number = 5)
+boost_model <- train(target~., data=df2_train, 
+                                method = "LogitBoost", 
+                                trControl = trControl2,
+                                tuneGrid = tuneGrid2)
+plot(boost_model)
+```
+
+
+
+4. Plot the comparison of the models in 2. 
+```{r}
+results <- resamples(list(forest_rf = forest_cv,
+                          forest_ranger = forest_cv1,
+                          boost = boost_model))
+bwplot(results)
+```
+
+5. What is your final selection for the model? Test the accuracy of your final model on the test data. 
+```{r}
+pred <- predict(boost_model,df2_test)
+cm <- confusionMatrix(data = factor(pred), reference = factor(df2_test$target), positive = "high cost")
+cm$overall[1]
+```
+
+6. Create another `target` variable (binary), decide the input variables and redo 1 to 5. 
+```{r}
+df1$target1 <- case_when(
+  df1$age <18 ~ 'Child',
+  TRUE ~ 'Adult')
+
+df3 <- df1 %>% 
+  select(target1,sex,raceethn,provider,moa,mod,admtype,campus,los) %>%
+  filter(admtype != '' & raceethn != '' & sex != 9)
+df3$age <- NULL
+str(df3)
+```
+
+```{r}
+df3$raceethn <- factor(df3$raceethn)
+df3$provider <- factor(df3$provider)
+df3$admtype <- factor(df3$admtype)
+df3$campus <- factor(df3$campus)
+df3$moa <- factor(df3$moa)
+df3$mod <- factor(df3$mod)
+df3$sex <- factor(df3$sex)
+df3$los <- factor(df3$los)
+```
+
+```{r}
+set.seed(2020)
+
+splitIndex <- createDataPartition(df3$target1, p = .10, 
+                                  list = FALSE)
+df3_train<- df3[ splitIndex,]
+df3_test <- df3[-splitIndex,]
+
+
+tree_model3 <- rpart(target1 ~ ., data = df3_train,
+                 control = rpart.control(maxdepth = 3))
+barplot(tree_model3$variable.importance)
+```
+```{r}
+tuneGrid <-  expand.grid(mtry = 2:4)
+trControl <-  trainControl(method = "cv", number = 5)
+forest_cv2 <- train(target1~., data=df3_train, 
+                                method = "rf", 
+                                trControl = trControl,
+                                tuneGrid = tuneGrid)
+plot(forest_cv2)
+```
+
+```{r}
+tuneGrid1 <-  expand.grid(mtry = 2:4,
+                       splitrule = c('gini', 'extratrees'),
+                       min.node.size = c(1:10))
+trControl1 <-  trainControl(method = "cv",
+                            number = 5)
+forest_cv3 <- train(target1~., data=df3_train, 
+                                method = "ranger", 
+                                trControl = trControl1,
+                                tuneGrid = tuneGrid1)
+plot(forest_cv3)
+```
+
+```{r}
+tuneGrid2 <-  expand.grid(nIter = 2:6)
+trControl2 <-  trainControl(method = "cv",
+                            number = 5)
+boost_model2 <- train(target1~., data=df3_train, 
+                                method = "LogitBoost", 
+                                trControl = trControl2,
+                                tuneGrid = tuneGrid2)
+plot(boost_model2)
+```
+
+```{r}
+pred1 <- predict(boost_model2,df3_test)
+cm1 <- confusionMatrix(data = pred1, reference = factor(df3_test$target1), positive = "Child")
+cm1$overall[1]
+```
+
+-------
