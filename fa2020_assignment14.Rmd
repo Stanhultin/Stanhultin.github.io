@@ -1,0 +1,173 @@
+
+---
+output: 
+  html_document:
+  pdf_document: default
+  word_document: default
+title: "Assignment 14: Writing a function - Loop"
+---
+
+-------
+
+1. Write the following function. Give examples to test your function.
+
+- Input: a data frame
+```{r}
+numeric_impute <- function(d)
+{
+  for (i in 1:length(d))
+  {
+      d[[i]] <- mean_impute(mean(i))
+  }
+  return(d)
+}
+```
+
+
+
+-------
+
+2. Write the following function. Give examples to test your function.
+
+- Input: a data frame
+
+- Output: a data frame with all the missing of variables replaced by the associated means (for numeric variables) or modes (for non-numeric variables).
+
+
+```{r}
+numeric_impute <- function(d)
+{
+  for (i in 1:length(d))
+  {
+    if(is.numeric(d[[i]]))
+    {
+      d[[i]] <- mean(d[[i]],na.rm = TRUE)
+    }
+    else
+    {
+      numeric_impute <- function(d)
+{
+  for (i in 1:length(d))
+  {
+      d[[i]] <- mode_impute(d[[i]])
+  }
+      
+  }
+  return(d)
+}}}
+```
+
+-------
+
+3. Write the following function. Give examples to test your function.
+
+- Input: a data frame
+
+- Output: Bar plots of all non-numeric variables
+
+Hint: [Similar function](https://bryantstats.github.io/math421/gganimate/14_writing_functions.html#32)
+
+```{r}
+density_plot <- function(d)
+{
+  library(ggplot2)
+  for (i in 1:length(d))
+  {
+    if (is.numeric(d[[i]]))
+    {
+      print(ggplot(d, aes(x = d[[i]]))+ 
+              geom_bar()+
+              labs(x = names(d)[i]))
+    }
+  }
+}
+```
+
+-------
+
+4. Write the following function. Give examples to test your function.
+
+- Input: a data frame
+
+- Output: all possible the bar plots of a non-numeric variable filled by a non-numeric variable.
+
+Hint: [Similar function](https://bryantstats.github.io/math421/gganimate/14_writing_functions.html#40)
+```{r}
+density_plot2 <- function(d)
+{
+  library(ggplot2)
+  l <- length(d)
+  for (i in 1:(l-1))
+    for (j in (i+1):l)
+  {
+    if (is.numeric(d[[i]])& (!is.numeric(d[[j]])))
+    {
+      print(ggplot(d, aes(x = d[[i]], color = d[[j]]))+ 
+              geom_bar()+labs(x = names(d)[i], color = names(d)[j]))
+    }
+      else
+      {
+        print(ggplot(d, aes(x = d[[i]], color = d[[j]]))+ 
+              geom_bar()+labs(x = names(d)[i], color = names(d)[j]))
+      }
+  }
+}
+```
+
+-------
+
+5. Write the following function. Give examples to test your function.
+
+- Input: a data frame
+
+- Output: 
+
+  - all possible the bar plots of a non-numeric variable filled by a non-numeric variable.
+  
+  - all possible the density plots of a numeric variable colored by a non-numeric variable
+  
+  - all possible the scatter plots.
+
+Hint: Combine [this function](https://bryantstats.github.io/math421/gganimate/14_writing_functions.html#36), [this function](https://bryantstats.github.io/math421/gganimate/14_writing_functions.html#39), and the function in Question 4. One way to combine is creating a new function, `quick_plot`, and call these three functions within `quic_kplot`. 
+
+```{r}
+scatter_plot <- function(d)
+{
+  library(ggplot2)
+  l <- length(d)
+  for (i in 1:(l-1))
+    for (j in (i+1):l)
+  {
+    if (is.numeric(d[[i]])&is.numeric(d[[j]]))
+    {
+      print(ggplot(d, aes(x = d[[i]], y = d[[j]]))+ 
+              geom_point()+
+              labs(x = names(d)[i], y = names(d)[j]))
+    }
+      else if
+      
+ (is.numeric(d[[i]])& (!is.numeric(d[[j]])))
+    {
+      print(ggplot(d, aes(x = d[[i]], color = d[[j]]))+ 
+              geom_density()+labs(x = names(d)[i], color = names(d)[j]))
+    }
+  }
+
+    
+     
+
+    if (is.numeric(d[[i]])& (!is.numeric(d[[j]])))
+    {
+      print(ggplot(d, aes(x = d[[i]], color = d[[j]]))+ 
+              geom_bar()+labs(x = names(d)[i], color = names(d)[j]))
+    }
+      else
+      {
+        print(ggplot(d, aes(x = d[[i]], color = d[[j]]))+ 
+              geom_bar()+labs(x = names(d)[i], color = names(d)[j]))
+      }
+  }
+
+ 
+```
+
